@@ -13,3 +13,8 @@ eureka:
 
 server:
   port: 8082
+  forward-headers-strategy: framework
+#
+#springdoc:
+#  swagger-ui:
+#    path:
