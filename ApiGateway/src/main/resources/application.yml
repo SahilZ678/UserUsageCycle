@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: ApiGateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://UserService
+          predicates:
+            - Path=/user/**
+          filters:
+            - RewritePath=/user(?<remaining>/?.*), $\{remaining}
+        - id: cycle-service
+          uri: lb://CycleService
+          predicates:
+            - Path=/cycle/**
+          filters:
+            - RewritePath=/cycle(?<remaining>/?.*), $\{remaining}
+        - id: daily-usage-service
+          uri: lb://DailyUsageService
+          predicates:
+            - Path=/dailyUsage/**
+          filters:
+            - RewritePath=/dailyUsage(?<remaining>/?.*), $\{remaining}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://eureka-server:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true

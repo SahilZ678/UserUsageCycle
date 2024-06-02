@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    build:
+      context: ./EurekaServer
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - eureka-network
+
+  api-gateway:
+    build:
+      context: ./ApiGateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      - eureka-server
+    command: ["java", "-jar", "/app/api-gateway.jar"]
+    networks:
+      - eureka-network
+
+  cycle-service:
+    build:
+      context: ./CycleService
+      dockerfile: Dockerfile
+    container_name: cycle-service
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://cycle-mongo:27017/cycle_database
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    ports:
+      - "8081:8081"
+    depends_on:
+      - cycle-mongo
+      - eureka-server
+    networks:
+      - eureka-network
+
+  user-service:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    container_name: user-service
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://user-mongo:27017/user_database
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    ports:
+      - "8083:8083"
+    depends_on:
+      - user-mongo
+      - eureka-server
+    networks:
+      - eureka-network
+
+  daily-usage-service:
+    build:
+      context: ./DailyUsageService
+      dockerfile: Dockerfile
+    container_name: daily-usage-service
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://daily-usage-mongo:27017/daily_usage_database
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    ports:
+      - "8082:8082"
+    depends_on:
+      - daily-usage-mongo
+      - eureka-server
+    networks:
+      - eureka-network
+
+  cycle-mongo:
+    image: mongo:latest
+    container_name: cycle-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - cycle-mongo-data:/data/db
+    networks:
+      - eureka-network
+
+  user-mongo:
+    image: mongo:latest
+    container_name: user-mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - user-mongo-data:/data/db
+    networks:
+      - eureka-network
+
+  daily-usage-mongo:
+    image: mongo:latest
+    container_name: daily-usage-mongo
+    ports:
+      - "27019:27017"
+    volumes:
+      - daily-usage-mongo-data:/data/db
+    networks:
+      - eureka-network
+
+volumes:
+  cycle-mongo-data:
+  user-mongo-data:
+  daily-usage-mongo-data:
+
+networks:
+  eureka-network:
+    driver: bridge
