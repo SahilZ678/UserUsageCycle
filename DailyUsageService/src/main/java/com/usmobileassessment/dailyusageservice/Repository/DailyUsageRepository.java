@@ -11,5 +11,6 @@ import java.util.List;
 public interface DailyUsageRepository extends MongoRepository<DailyUsage, String> {
     List<DailyUsage> findByMdn(String mdn);
     List<DailyUsage> findByUserId(String userId);
+    List<DailyUsage> findByUserIdAndMdn(String userId, String mdn);
     List<DailyUsage> findByUsageDateBetween(Date startDate, Date endDate);
 }

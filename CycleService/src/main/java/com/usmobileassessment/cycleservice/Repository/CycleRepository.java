@@ -10,4 +10,6 @@ import java.util.List;
 public interface CycleRepository extends MongoRepository<Cycle, String> {
     List<Cycle> findByUserId(String userId);
     List<Cycle> findByMdn(String mdn);
+    List<Cycle> findByUserIdAndMdn(String userId, String mdn);
+
 }
