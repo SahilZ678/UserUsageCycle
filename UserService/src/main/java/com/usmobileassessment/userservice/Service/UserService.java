@@ -17,6 +17,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuditService auditService;
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found with email " + email));
     }
@@ -26,10 +29,12 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        auditService.log("CREATE", user, user.getId());
         return userRepository.save(user);
     }
 
     public User updateUser(String userId, UserRequestDTO user) {
+        auditService.log("UPDATE", user, userId);
         Optional<User> currentUser = userRepository.findById(userId);
         if(currentUser.isPresent()) {
             User userToUpdate= currentUser.get();
