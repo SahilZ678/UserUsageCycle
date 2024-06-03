@@ -9,6 +9,11 @@ services:
       - "8761:8761"
     networks:
       - eureka-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   api-gateway:
     build:
@@ -18,12 +23,17 @@ services:
       - "8080:8080"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
     depends_on:
-      - eureka-server
+      eureka-server:
+        condition: service_healthy
     command: ["java", "-jar", "/app/api-gateway.jar"]
     networks:
       - eureka-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   cycle-service:
     build:
@@ -33,14 +43,22 @@ services:
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://cycle-mongo:27017/cycle_database
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
     ports:
       - "8081:8081"
     depends_on:
-      - cycle-mongo
-      - eureka-server
+      cycle-mongo:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
     networks:
       - eureka-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   user-service:
     build:
@@ -50,14 +68,20 @@ services:
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://user-mongo:27017/user_database
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
     ports:
       - "8083:8083"
     depends_on:
-      - user-mongo
-      - eureka-server
+      user-mongo:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
     networks:
       - eureka-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   daily-usage-service:
     build:
@@ -67,14 +91,22 @@ services:
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://daily-usage-mongo:27017/daily_usage_database
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
-#      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
     ports:
       - "8082:8082"
     depends_on:
-      - daily-usage-mongo
-      - eureka-server
+      daily-usage-mongo:
+        condition: service_started
+      eureka-server:
+        condition: service_healthy
+      cycle-service:
+        condition: service_healthy
     networks:
       - eureka-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   cycle-mongo:
     image: mongo:latest

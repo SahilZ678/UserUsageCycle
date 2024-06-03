@@ -16,6 +16,10 @@ public class CycleService {
     @Autowired
     private CycleRepository cycleRepository;
 
+    public List<Cycle> getAllCycles() {
+        return cycleRepository.findAll();
+    }
+
     public List<Cycle> getCyclesByUserId(String userId) {
         return cycleRepository.findByUserId(userId);
     }

@@ -11,6 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 public class UserController {
 
@@ -21,6 +24,12 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
         User user = userService.getUserByEmail(email);
         return ResponseEntity.ok(userService.convertToDto(user));
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users.stream().map(user -> userService.convertToDto(user)).collect(Collectors.toList()));
     }
 
     @PostMapping("/")

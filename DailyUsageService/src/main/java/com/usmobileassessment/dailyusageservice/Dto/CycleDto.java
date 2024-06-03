@@ -11,4 +11,6 @@ public class CycleDto {
     private String id;
     private Date startDate;
     private Date endDate;
+    private String mdn;
+    private String userId;
 }

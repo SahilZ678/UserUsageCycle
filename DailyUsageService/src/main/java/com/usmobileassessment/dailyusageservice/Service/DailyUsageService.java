@@ -34,7 +34,8 @@ public class DailyUsageService {
     public List<DailyUsage> getCurrentCycleDailyUsage(String userId, String mdn) {
         CycleDto latestCycle = cycleClient.getLatestCycleHistory(userId, mdn);
         if(latestCycle != null) {
-            return getUsageBetweenDates(latestCycle.getStartDate(), latestCycle.getEndDate());
+            return dailyUsageRepository.findByUsageDateBetweenAndUserIdAndMdn(latestCycle.getStartDate(),
+                    latestCycle.getEndDate(), userId, mdn);
         } else {
             throw new RuntimeException("No Latest Cycle could be found");
         }

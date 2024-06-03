@@ -8,8 +8,8 @@ eureka:
       defaultZone: http://eureka-server:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-#  instance:
-#    prefer-ip-address: true
+  instance:
+    health-check-url-path: /actuator/health
 
 server:
   port: 8083

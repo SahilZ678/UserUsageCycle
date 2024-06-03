@@ -17,6 +17,11 @@ public class CycleController {
     @Autowired
     private CycleService cycleService;
 
+    @GetMapping("/")
+    public ResponseEntity<List<Cycle>> getAllCycles() {
+        return ResponseEntity.ok(cycleService.getAllCycles());
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Cycle>> getCyclesByUserId(@PathVariable String userId) {
         return ResponseEntity.ok(cycleService.getCyclesByUserId(userId));
@@ -35,9 +40,9 @@ public class CycleController {
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<CycleResponseDto> getLatestCycleHistory(@RequestParam String userId, @RequestParam String mdn) {
+    public ResponseEntity<Cycle> getLatestCycleHistory(@RequestParam String userId, @RequestParam String mdn) {
         Optional<Cycle> latestCycle = cycleService.getLatestCycle(userId, mdn);
-        CycleResponseDto cycleResponseDto = latestCycle.map(cycle -> cycleService.convertToDto(cycle)).orElse(null);
-        return ResponseEntity.ok(cycleResponseDto);
+//        CycleResponseDto cycleResponseDto = latestCycle.map(cycle -> cycleService.convertToDto(cycle)).orElse(null);
+        return ResponseEntity.ok(latestCycle.get());
     }
 }

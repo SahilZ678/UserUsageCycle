@@ -26,5 +26,7 @@ RUN ./gradlew clean build -x test
 # Copy the executable jar file into the container
 RUN cp $(find build/libs -name "*.jar" | head -n 1) /app/daily-usage-service.jar
 
+RUN apt-get update && apt-get install -y curl
+
 # Run the jar file
 ENTRYPOINT ["java", "-jar", "/app/daily-usage-service.jar"]
