@@ -37,3 +37,15 @@ dependencyManagement {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+springBoot {
+    mainClass = 'com.usmobileassessment.eurekaserver.EurekaServerApplication'
+}
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    enabled = true
+}

@@ -40,3 +40,15 @@ dependencyManagement {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+springBoot {
+	mainClass = 'com.usmobileassessment.apigateway.ApiGatewayApplication'
+}
+
+jar {
+	enabled = false
+}
+
+bootJar {
+	enabled = true
+}
